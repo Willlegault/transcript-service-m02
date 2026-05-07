@@ -43,3 +43,43 @@ describe('getTranscript', () => {
     expect(() => db.getTranscript(1)).toThrowError();
   });
 });
+
+describe('addGrade', () => {
+  // satisfaction condition: add a new grade for an existing student
+  it('should add the grade to the transcript of an existing student', () => {
+    const id1 = db.addStudent('blair');
+    const grade = { course: 'cs4530', grade: 95 };
+
+    db.addGrade(id1, 'cs4530', grade);
+
+    expect(db.getTranscript(id1).grades).toStrictEqual([grade]);
+  });
+
+  it('should let getGrade return the grade that was added for a course', () => {
+    const id1 = db.addStudent('blair');
+    const grade = { course: 'cs4530', grade: 95 };
+
+    db.addGrade(id1, 'cs4530', grade);
+
+    expect(db.getGrade(id1, 'cs4530')).toStrictEqual(grade);
+  });
+
+  // Spec 1: spec doesn't say what to do for an unknown ID
+  // throw error
+  it('should throw an error when adding a grade for an unknown student ID', () => {
+    expect(() => db.addGrade(1, 'cs4530', { course: 'cs4530', grade: 95 })).toThrowError();
+  });
+
+  // Spec 2: spec doesn't say what to do if a grade already exists
+  // choose to replace
+  it('should replace the existing grade when the same course is added again', () => {
+    const id1 = db.addStudent('blair');
+    const firstGrade = { course: 'cs4530', grade: 80 };
+    const secondGrade = { course: 'cs4530', grade: 95 };
+
+    db.addGrade(id1, 'cs4530', firstGrade);
+    db.addGrade(id1, 'cs4530', secondGrade);
+
+    expect(db.getTranscript(id1).grades).toStrictEqual([secondGrade]);
+  });
+});
